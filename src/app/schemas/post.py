@@ -36,7 +36,7 @@ class PostCreate(PostBase):
 
     media_url: Annotated[
         str | None,
-        Field(pattern=r"^(https?|ftp)://[^\s/$.?#].[^\s]*$", examples=["https://www.postimageurl.com"], default=None),
+        Field(min_length=1, max_length=63206, examples=["https://www.postimageurl.com"], default=None),
     ]
 
 
