@@ -73,36 +73,42 @@ class VideoFormat(str, Enum):
 
     # return created_post
 
-@router.get("/{username}/video/{id}", 
+@router.get("/video/{prompt}", 
             description="Get the video a video by choosing the right format and entering the username. \n The Id is specific to the video that has been posted and returns a dummy video in all other cases")
-# @cache(key_prefix="{username}_post_cache", resource_id_name="id")
+# @cache(key_prefix="{prompt}_post_cache")
 async def get_video(
     request: Request, 
+    prompt: str,
     # current_user: Annotated[UserRead, Depends(get_current_user)],
-    db: Annotated[AsyncSession, Depends(async_get_db)],
+    # db: Annotated[AsyncSession, Depends(async_get_db)],
     format: VideoFormat,
-    username: str , 
-    id: int,
+    # username: str ,
+    # id: int,
     ):
-    db_user = await crud_users.get(db=db, schema_to_select=UserRead, username=username, is_deleted=False)
-    if db_user is None:
-        raise NotFoundException("User not found")
-    db_post: PostRead | None = await crud_posts.get(
-        db=db, schema_to_select=PostRead, id=id, created_by_user_id=db_user["id"], is_deleted=False
-    )
+    # db_user = await crud_users.get(db=db, schema_to_select=UserRead, username=username, is_deleted=False)
+    # if db_user is None:
+    #     raise NotFoundException("User not found")
+    # db_post: PostRead | None = await crud_posts.get(
+    #     db=db, schema_to_select=PostRead, id=id, created_by_user_id=db_user["id"], is_deleted=False
+    # )
     # if current_user["id"] != db_user["id"]:
     #     raise ForbiddenException()
-    if db_post is None:
-        file_location = "videos/10.mp4"
+    # if db_post is None:
+    #     file_location = "videos/10.mp4"
+    # else:
+    #     file_location = os.path.join(db_post['media_url'],str(id)+format)
+    # if not os.path.isfile(file_location):
+    #     # raise HTTPException(status_code=404, detail="Video not found")
+    if format == ".mp4":
+        file_location = "videos/sample.mp4"
     else:
-        file_location = os.path.join(db_post['media_url'],str(id)+format)
-    if not os.path.isfile(file_location):
-        # raise HTTPException(status_code=404, detail="Video not found")
-        file_location = "videos/10.mp4"
+        file_location = "videos/sample.fbx"
+    filename="sample"+format
     # This alternative return gives us download
-    # return FileResponse(path=file_location, media_type='application/octet-stream',filename=str(id)+format)
+    # return FileResponse(path=file_location, media_type='application/octet-stream',filename=dummyname+format)
     media_type = "video/" + format[1:]
-    filename = str(id)+format
+    # filename = "Sample"+format
+    print(f"prompt received is {prompt}")
     return FileResponse(
         path=file_location,
         media_type=media_type,
